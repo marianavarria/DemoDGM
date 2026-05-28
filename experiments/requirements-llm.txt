@@ -1,0 +1,2 @@
+# Dipendenze aggiuntive per Demo 7 (Ollama + LiteLLM)
+litellm>=1.0.0

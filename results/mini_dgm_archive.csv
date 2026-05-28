@@ -1,0 +1,22 @@
+name,parent,generation,train_score,test_score,valid,description
+initial_agent,,0,0.5833333333333334,0.5,True,Agente iniziale ingenuo: risponde sempre False.
+always_true,initial_agent,1,0.4166666666666667,0.5,True,Risponde sempre True.
+always_false,initial_agent,1,0.5833333333333334,0.5,True,Risponde sempre False.
+even_length,initial_agent,1,0.25,0.5,True,Predice palindromo se la lunghezza è pari.
+first_last_equal,initial_agent,1,0.75,0.8,True,Predice palindromo se primo e ultimo carattere coincidono.
+reverse_check,initial_agent,1,1.0,1.0,True,Controlla se la stringa è uguale alla sua inversa.
+always_true,initial_agent,1,0.4166666666666667,0.5,True,Risponde sempre True.
+always_false,initial_agent,1,0.5833333333333334,0.5,True,Risponde sempre False.
+even_length,initial_agent,1,0.25,0.5,True,Predice palindromo se la lunghezza è pari.
+first_last_equal,initial_agent,1,0.75,0.8,True,Predice palindromo se primo e ultimo carattere coincidono.
+reverse_check,initial_agent,1,1.0,1.0,True,Controlla se la stringa è uguale alla sua inversa.
+always_true,even_length,2,0.4166666666666667,0.5,True,Risponde sempre True.
+always_false,even_length,2,0.5833333333333334,0.5,True,Risponde sempre False.
+even_length,even_length,2,0.25,0.5,True,Predice palindromo se la lunghezza è pari.
+first_last_equal,even_length,2,0.75,0.8,True,Predice palindromo se primo e ultimo carattere coincidono.
+reverse_check,even_length,2,1.0,1.0,True,Controlla se la stringa è uguale alla sua inversa.
+always_true,first_last_equal,2,0.4166666666666667,0.5,True,Risponde sempre True.
+always_false,first_last_equal,2,0.5833333333333334,0.5,True,Risponde sempre False.
+even_length,first_last_equal,2,0.25,0.5,True,Predice palindromo se la lunghezza è pari.
+first_last_equal,first_last_equal,2,0.75,0.8,True,Predice palindromo se primo e ultimo carattere coincidono.
+reverse_check,first_last_equal,2,1.0,1.0,True,Controlla se la stringa è uguale alla sua inversa.

@@ -1,0 +1,62 @@
+# Ambiente Python locale
+.venv/
+venv/
+env/
+
+# Repository ufficiali clonati (linkati nel README)
+dgm/
+HyperAgents/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# Segreti e credenziali
+.env
+.env.*
+*.pem
+credentials.json
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Dump locali con path assoluti Windows (non servono su GitHub)
+results/*_files.txt
+results/dgm_*.txt
+results/hyperagents_*.txt
+
+# Demo LLM + sandbox Docker
+runs/
+results/sandbox_logs/
+results/llm_logs/
+
+# Notebook checkpoint
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Log e file temporanei
+*.log
+*.tmp
+*.bak
+
+# Coverage / test artifacts
+.coverage
+coverage.xml
+htmlcov/
+
+# Cache strumenti Python
+.mypy_cache/
+.ruff_cache/
+.pyre/
+
+# Cursor
+.cursor/

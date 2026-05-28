@@ -1,0 +1,41 @@
+Iterazione 1: best=reverse_check, train=1.00, test=1.00
+Iterazione 2: best=reverse_check, train=1.00, test=1.00
+Iterazione 3: best=reverse_check, train=1.00, test=1.00
+Iterazione 4: best=reverse_check, train=1.00, test=1.00
+
+=== ARCHIVIO FINALE ===
+Nome               Parent             Train    Test     Descrizione
+------------------------------------------------------------------------------------------
+initial_agent      None               0.58     0.50     Agente iniziale ingenuo: risponde sempre False.
+always_true        initial_agent      0.42     0.50     Risponde sempre True.
+always_false       initial_agent      0.58     0.50     Risponde sempre False.
+even_length        initial_agent      0.25     0.50     Predice palindromo se la lunghezza è pari.
+first_last_equal   initial_agent      0.75     0.80     Predice palindromo se primo e ultimo carattere coincidono.
+reverse_check      initial_agent      1.00     1.00     Controlla se la stringa è uguale alla sua inversa.
+always_true        initial_agent      0.42     0.50     Risponde sempre True.
+always_false       initial_agent      0.58     0.50     Risponde sempre False.
+even_length        initial_agent      0.25     0.50     Predice palindromo se la lunghezza è pari.
+first_last_equal   initial_agent      0.75     0.80     Predice palindromo se primo e ultimo carattere coincidono.
+reverse_check      initial_agent      1.00     1.00     Controlla se la stringa è uguale alla sua inversa.
+always_true        even_length        0.42     0.50     Risponde sempre True.
+always_false       even_length        0.58     0.50     Risponde sempre False.
+even_length        even_length        0.25     0.50     Predice palindromo se la lunghezza è pari.
+first_last_equal   even_length        0.75     0.80     Predice palindromo se primo e ultimo carattere coincidono.
+reverse_check      even_length        1.00     1.00     Controlla se la stringa è uguale alla sua inversa.
+always_true        first_last_equal   0.42     0.50     Risponde sempre True.
+always_false       first_last_equal   0.58     0.50     Risponde sempre False.
+even_length        first_last_equal   0.25     0.50     Predice palindromo se la lunghezza è pari.
+first_last_equal   first_last_equal   0.75     0.80     Predice palindromo se primo e ultimo carattere coincidono.
+reverse_check      first_last_equal   1.00     1.00     Controlla se la stringa è uguale alla sua inversa.
+
+=== MIGLIOR AGENTE ===
+Nome: reverse_check
+Train score: 1.00
+Test score: 1.00
+Codice:
+def solve(s):
+    normalized = s.strip().lower()
+    return normalized == normalized[::-1]
+
+Memoria meta-agent:
+- Serve una regola strutturale, non una costante.
