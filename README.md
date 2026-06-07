@@ -1,48 +1,48 @@
-# DGM-Hyperagents — mini-demo didattiche
+# DGM-Hyperagents — Educational Mini-Demos
 
-Riproduzione in piccolo dei concetti algoritmici di **DGM-Hyperagents** (Zhang et al., arXiv 2603.19461), con sette demo eseguibili su Windows e analisi dei repository ufficiali.
+A small-scale reproduction of the algorithmic concepts from **DGM-Hyperagents** (Zhang et al., arXiv 2603.19461), with seven runnable demos on Windows and analysis of the official repositories.
 
-Relazione ufficiale: [`REPORT.md`](REPORT.md) (inglese) · traduzione italiana: [`RELAZIONE.md`](RELAZIONE.md).
+Official report: [`REPORT.md`](REPORT.md) (English) · Italian translation: [`RELAZIONE.md`](RELAZIONE.md).
 
-English README: [`README_EN.md`](README_EN.md)
+Italian README: [`README.md`](README.md)
 
 ---
 
-## Contesto teorico
+## Theoretical background
 
-Questo repository implementa una **mini DGM-H** (Darwin Gödel Machine — Hyperagents): un ciclo evolutivo in cui un **meta-agent** propone modifiche al **task agent**, che viene valutato e inserito in un **archivio open-ended**. A ogni iterazione si seleziona un parent, si generano figli e si ripete.
+This repository implements a **mini DGM-H** (Darwin Gödel Machine — Hyperagents): an evolutionary loop where a **meta-agent** proposes changes to a **task agent**, which is evaluated and stored in an **open-ended archive**. Each iteration selects a parent, generates children, and repeats.
 
 ```text
 generate → evaluate → archive → select parent → modify
 ```
 
-| Demo | Concetto del paper (Sez.) | Cosa verifica |
+| Demo | Paper concept (Sec.) | What it verifies |
 |---|---|---|
-| 1 | Archivio open-ended vs baseline (Alg. 3) | Archivio completo vs solo ultimo agente |
-| 2 | Self-improvement del meta-agent (§5.1) | Meta-agent congelato vs meta-agent evolutivo |
+| 1 | Open-ended archive vs baseline (Alg. 3) | Full archive vs last agent only |
+| 2 | Meta-agent self-improvement (§5.1) | Frozen meta-agent vs evolving meta-agent |
 | 3 | Parent selection (§8.2) | `random`, `best`, `score_prop`, `score_child_prop` |
-| 4 | Multi-domain (§8.4) | Stesso framework su un secondo task (vocali) |
-| 5 | Code-repair / Polyglot (§5.1) | Riparazione codice senza LLM |
-| 6 | — | Overview grafica di tutte le demo |
-| 7 | LLM + safety sandbox (§6) | Ollama + valutazione in Docker (`mock` vs `real`) |
+| 4 | Multi-domain (§8.4) | Same framework on a second task (vowels) |
+| 5 | Code-repair / Polyglot (§5.1) | Code repair without LLM |
+| 6 | — | Graphical overview of all demos |
+| 7 | LLM + safety sandbox (§6) | Ollama + Docker evaluation (`mock` vs `real`) |
 
-Spiegazione estesa, formule e risultati numerici: [`REPORT.md`](REPORT.md) (§2–§16). Repository ufficiali analizzati: §15.
+Extended explanation, formulas, and numeric results: [`REPORT.md`](REPORT.md) (§2–§16). Official repositories: §15.
 
 ---
 
-## Prerequisiti
+## Prerequisites
 
-| Componente | Demo 1–6 | Demo 7 (mock) | Demo 7 (LLM reale) |
+| Component | Demo 1–6 | Demo 7 (mock) | Demo 7 (real LLM) |
 |---|---|---|---|
-| **Python** ≥ 3.10 | sì | sì | sì |
-| **matplotlib** | sì (grafici) | sì | sì |
-| **Docker Desktop** | no | sì | sì |
-| **Ollama** | no | no | sì |
-| **litellm** | no | no | sì |
+| **Python** ≥ 3.10 | yes | yes | yes |
+| **matplotlib** | yes (plots) | yes | yes |
+| **Docker Desktop** | no | yes | yes |
+| **Ollama** | no | no | yes |
+| **litellm** | no | no | yes |
 
-### Repository ufficiali (analisi, opzionale)
+### Official repositories (optional analysis)
 
-I clone non sono inclusi nel repository Git (vedi `.gitignore`). Per l’analisi descritta in REPORT §15:
+Clones are not included in the Git repository (see `.gitignore`). For the analysis described in REPORT §15:
 
 ```powershell
 git clone https://github.com/jennyzzt/dgm.git dgm
@@ -51,13 +51,13 @@ cd dgm && git checkout a565fd2d1dca504ef5104a7cc0f3bdc4ab9b4fd2
 cd ../HyperAgents && git checkout 59a68f672dfb92c74aeb7e61535d776fb36e172d
 ```
 
-Commit registrati in [`results/repo_commits.txt`](results/repo_commits.txt).
+Commits recorded in [`results/repo_commits.txt`](results/repo_commits.txt).
 
 ---
 
-## Configurazione dell’ambiente
+## Environment setup
 
-Dalla root del progetto (`dgm_hyperagents/`):
+From the project root (`dgm_hyperagents/`):
 
 **Windows (PowerShell):**
 
@@ -75,204 +75,204 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-**Demo 7 — prerequisiti aggiuntivi:**
+**Demo 7 — additional prerequisites:**
 
 ```bash
-docker run hello-world          # obbligatorio per Demo 7 (mock e reale)
-ollama pull llama3.2            # solo modalità LLM reale (senza --mock)
+docker run hello-world          # required for Demo 7 (mock and real)
+ollama pull llama3.2            # real LLM mode only (without --mock)
 ```
 
-### Variabili d’ambiente (Demo 7)
+### Environment variables (Demo 7)
 
-| Variabile | Default | Descrizione |
+| Variable | Default | Description |
 |---|---|---|
-| `OLLAMA_MODEL` | `ollama/llama3.2` | Modello LiteLLM |
-| `OLLAMA_API_BASE` | `http://localhost:11434` | Endpoint Ollama |
-| `DGMH_SANDBOX_IMAGE` | `python:3.12-slim` | Immagine Docker per la sandbox |
-| `DGMH_LLM_ITERATIONS` | `12` | Iterazioni del ciclo DGM-H |
-| `DGMH_LLM_SEEDS` | `2` | Numero di seed (0 … N−1) |
+| `OLLAMA_MODEL` | `ollama/llama3.2` | LiteLLM model |
+| `OLLAMA_API_BASE` | `http://localhost:11434` | Ollama endpoint |
+| `DGMH_SANDBOX_IMAGE` | `python:3.12-slim` | Docker image for the sandbox |
+| `DGMH_LLM_ITERATIONS` | `12` | DGM-H loop iterations |
+| `DGMH_LLM_SEEDS` | `2` | Number of seeds (0 … N−1) |
 
 ---
 
-## Esecuzione completa (dall’inizio alla fine)
+## Full run (start to finish)
 
-Dopo il setup sopra, dalla **root** del progetto (con venv attivo):
+After the setup above, from the project **root** (with venv active):
 
 ```bash
-# Demo 1–5: solo Python + matplotlib (pochi secondi ciascuna)
+# Demos 1–5: Python + matplotlib only (a few seconds each)
 python experiments/ablation_archive.py
 python experiments/ablation_self_improve.py
 python experiments/parent_selection_strategies.py
 python experiments/task_vowels.py
 python experiments/mini_code_repair.py
 
-# Demo 7: richiede Docker Desktop avviato
-python experiments/llm_code_repair.py --mock    # test pipeline Docker (no Ollama)
-python experiments/llm_code_repair.py           # LLM reale (Ollama + litellm)
+# Demo 7: requires Docker Desktop running
+python experiments/llm_code_repair.py --mock    # test Docker pipeline (no Ollama)
+python experiments/llm_code_repair.py           # real LLM (Ollama + litellm)
 
-# Demo 6: overview (dopo tutti i CSV)
+# Demo 6: overview (after all CSV files exist)
 python experiments/plot_progress.py
 ```
 
-**Solo Demo 1–6 (senza Docker):** eseguire le prime cinque righe + `plot_progress.py`.  
-**Solo rigenerare i PNG** dai CSV già presenti: `python experiments/regenerate_plots.py` poi `plot_progress.py`.
+**Demos 1–6 only (no Docker):** run the first five commands + `plot_progress.py`.  
+**Regenerate PNGs only** from existing CSVs: `python experiments/regenerate_plots.py` then `plot_progress.py`.
 
-Output atteso: CSV e PNG in `results/` (vedi sezione seguente per il dettaglio per demo).
+Expected output: CSV and PNG files in `results/` (see per-demo details below).
 
 ---
 
-## Esecuzione delle demo (dettaglio)
+## Running the demos (details)
 
-Tutti i comandi vanno lanciati **dalla root** del progetto. Output in `results/` (CSV + PNG).
+Run all commands **from the project root**. Output in `results/` (CSV + PNG).
 
-### Demo 1 — Ablation archivio
+### Demo 1 — Archive ablation
 
-Confronta archivio completo vs solo ultimo agente (palindromi).
+Compares full archive vs last agent only (palindromes).
 
 ```powershell
 python experiments/ablation_archive.py
 ```
 
 - **Output:** `results/ablation_archive.csv`, `results/ablation_archive.png`
-- **Varianti CSV:** `con_archivio`, `senza_archivio`
-- **Dipendenze:** stdlib + matplotlib
+- **CSV variants:** `con_archivio`, `senza_archivio`
+- **Dependencies:** stdlib + matplotlib
 
-### Demo 2 — Ablation self-improve
+### Demo 2 — Self-improve ablation
 
-Meta-agent congelato vs meta-agent che sblocca mutazioni nascoste.
+Frozen meta-agent vs meta-agent that unlocks hidden mutations.
 
 ```powershell
 python experiments/ablation_self_improve.py
 ```
 
 - **Output:** `results/ablation_self_improve.csv`, `results/ablation_self_improve.png`
-- **Varianti CSV:** `meta_congelato`, `meta_self_improve`
-- **Dipendenze:** stdlib + matplotlib
+- **CSV variants:** `meta_congelato`, `meta_self_improve`
+- **Dependencies:** stdlib + matplotlib
 
 ### Demo 3 — Parent selection
 
-Confronto delle quattro strategie di Sez. 8.2 del paper.
+Compares the four strategies from Sec. 8.2 of the paper.
 
 ```powershell
 python experiments/parent_selection_strategies.py
 ```
 
 - **Output:** `results/parent_selection.csv`, `results/parent_selection.png`
-- **Varianti CSV:** `random`, `best`, `score_prop`, `score_child_prop`
-- **Dipendenze:** stdlib + matplotlib
+- **CSV variants:** `random`, `best`, `score_prop`, `score_child_prop`
+- **Dependencies:** stdlib + matplotlib
 
-### Demo 4 — Task vocali
+### Demo 4 — Vowel task
 
-Secondo dominio: classificazione stringhe di sole vocali.
+Second domain: classify strings of vowels only.
 
 ```powershell
 python experiments/task_vowels.py
 ```
 
 - **Output:** `results/task_vowels.csv`, `results/task_vowels.png`
-- **Varianti CSV:** `task_vocali`
-- **Dipendenze:** stdlib + matplotlib
+- **CSV variants:** `task_vocali`
+- **Dependencies:** stdlib + matplotlib
 
 ### Demo 5 — Mini code-repair
 
-Code-repair deterministico (`a - b` → `a + b`), senza LLM né Docker.
+Deterministic code repair (`a - b` → `a + b`), no LLM or Docker.
 
 ```powershell
 python experiments/mini_code_repair.py
 ```
 
 - **Output:** `results/code_repair.csv`, `results/code_repair.png`
-- **Varianti CSV:** `mini_code_repair`
-- **Dipendenze:** stdlib + matplotlib
+- **CSV variants:** `mini_code_repair`
+- **Dependencies:** stdlib + matplotlib
 
-### Demo 6 — Overview grafica
+### Demo 6 — Plot overview
 
-Grafico riassuntivo da tutti i CSV esistenti.
+Summary chart from all existing CSV files.
 
 ```powershell
 python experiments/plot_progress.py
 ```
 
 - **Output:** `results/all_demos_overview.png`
-- **Dipendenze:** matplotlib
-- **Nota:** eseguire dopo le altre demo per avere tutti i CSV.
-- **Rigenerare PNG da CSV esistenti** (senza rieseguire le demo): `python experiments/regenerate_plots.py`
+- **Dependencies:** matplotlib
+- **Note:** run after the other demos to have all CSV files.
+- **Regenerate PNGs from existing CSVs** (without re-running demos): `python experiments/regenerate_plots.py`
 
 ### Demo 7 — LLM (Ollama) + Docker sandbox
 
-Stesso task della Demo 5, con meta-agent Ollama e valutazione in container isolato.
+Same task as Demo 5, with Ollama meta-agent and evaluation in an isolated container.
 
-**Modalità mock** (patch fissa, nessuna chiamata Ollama — utile per testare Docker):
+**Mock mode** (fixed patch, no Ollama calls — useful to test Docker):
 
 ```powershell
 python experiments/llm_code_repair.py --mock
 ```
 
-**Modalità LLM reale** (Ollama + LiteLLM):
+**Real LLM mode** (Ollama + LiteLLM):
 
 ```powershell
 python experiments/llm_code_repair.py
 ```
 
-| Modalità | Flag | Colonna `mode` | Variante CSV | File dedicato |
+| Mode | Flag | `mode` column | CSV variant | Dedicated file |
 |---|---|---|---|---|
 | Mock | `--mock` | `mock` | `llm_code_repair_mock` | `results/llm_code_repair_mock.csv` |
-| LLM reale | (nessuno) | `real` | `llm_code_repair` | `results/llm_code_repair_real.csv` |
+| Real LLM | (none) | `real` | `llm_code_repair` | `results/llm_code_repair_real.csv` |
 
-File combinato (entrambe le modalità, se presenti): `results/llm_code_repair.csv`  
-Grafici: `results/llm_code_repair_mock.png`, `results/llm_code_repair_real.png`, `results/llm_code_repair.png`  
-Log: `results/llm_logs/`, `results/sandbox_logs/`, `runs/sandbox/`
+Combined file (both modes, when present): `results/llm_code_repair.csv`  
+Plots: `results/llm_code_repair_mock.png`, `results/llm_code_repair_real.png`, `results/llm_code_repair.png`  
+Logs: `results/llm_logs/`, `results/sandbox_logs/`, `runs/sandbox/`
 
 ---
 
-## Artefatti extra
+## Extra artifacts
 
-| Script | Comando | Output |
+| Script | Command | Output |
 |---|---|---|
-| Demo originale palindromi | `python experiments/mini_dgm_hyperagent.py` | `results/mini_dgm_archive.csv` |
-| Notebook didattico | `jupyter notebook experiments/demo_passo_passo.ipynb` | — |
+| Original palindrome demo | `python experiments/mini_dgm_hyperagent.py` | `results/mini_dgm_archive.csv` |
+| Tutorial notebook | `jupyter notebook experiments/demo_passo_passo.ipynb` | — |
 
 ---
 
-## Struttura del progetto
+## Project structure
 
 ```text
 dgm_hyperagents/
-├── README.md                 ← questo file
-├── README_EN.md              ← versione inglese
-├── REPORT.md                 ← relazione ufficiale (inglese)
-├── RELAZIONE.md              ← traduzione italiana
-├── requirements.txt          ← dipendenze Python (tutte le demo)
-├── experiments/              ← codice eseguibile
-│   ├── common.py             ← ciclo DGM-H condiviso
+├── README.md                 ← Italian version
+├── README_EN.md              ← this file
+├── REPORT.md                 ← official report (English)
+├── RELAZIONE.md              ← Italian translation
+├── requirements.txt          ← Python dependencies (all demos)
+├── experiments/              ← runnable code
+│   ├── common.py             ← shared DGM-H loop
 │   ├── ablation_archive.py   ← Demo 1
 │   ├── ablation_self_improve.py ← Demo 2
 │   ├── parent_selection_strategies.py ← Demo 3
 │   ├── task_vowels.py        ← Demo 4
 │   ├── mini_code_repair.py   ← Demo 5
 │   ├── plot_progress.py      ← Demo 6
-│   ├── regenerate_plots.py   ← rigenera PNG da CSV
+│   ├── regenerate_plots.py   ← regenerate PNGs from CSV
 │   ├── llm_code_repair.py    ← Demo 7
 │   └── demo_passo_passo.ipynb
-├── results/                  ← CSV e PNG generati
-├── dgm/                      ← clone repo ufficiale (gitignored)
-└── HyperAgents/              ← clone repo ufficiale (gitignored)
+├── results/                  ← generated CSV and PNG
+├── dgm/                      ← official repo clone (gitignored)
+└── HyperAgents/              ← official repo clone (gitignored)
 ```
 
 ---
 
-## Repository ufficiali analizzati
+## Official repositories analyzed
 
-| Repository | URL | Commit testato |
+| Repository | URL | Tested commit |
 |---|---|---|
 | DGM | https://github.com/jennyzzt/dgm | `a565fd2d1dca504ef5104a7cc0f3bdc4ab9b4fd2` |
 | HyperAgents | https://github.com/facebookresearch/Hyperagents | `59a68f672dfb92c74aeb7e61535d776fb36e172d` |
 
-Dettaglio dell’analisi: REPORT §15.
+Analysis details: REPORT §15.
 
 ---
 
-## Riferimenti
+## References
 
 - Zhang J. et al. (2026). *Hyperagents*. arXiv 2603.19461.
 - Zhang J. et al. (2025). *Darwin Gödel Machine*. arXiv 2505.22954.
