@@ -2,7 +2,7 @@
 
 A small-scale reproduction of the algorithmic concepts from **DGM-Hyperagents** (Zhang et al., arXiv 2603.19461), with seven runnable demos on Windows and analysis of the official repositories.
 
-Full report documentation: [`RELAZIONE.md`](RELAZIONE.md) (Italian) · [`RELAZIONE_EN.md`](RELAZIONE_EN.md) (English).
+Official report: [`REPORT.md`](REPORT.md) (English) · Italian translation: [`RELAZIONE.md`](RELAZIONE.md).
 
 Italian README: [`README.md`](README.md)
 
@@ -26,7 +26,7 @@ generate → evaluate → archive → select parent → modify
 | 6 | — | Graphical overview of all demos |
 | 7 | LLM + safety sandbox (§6) | Ollama + Docker evaluation (`mock` vs `real`) |
 
-Extended explanation, formulas, and numeric results: [`RELAZIONE_EN.md`](RELAZIONE_EN.md) (§2–§16). Official repositories: §15.
+Extended explanation, formulas, and numeric results: [`REPORT.md`](REPORT.md) (§2–§16). Official repositories: §15.
 
 ---
 
@@ -42,7 +42,7 @@ Extended explanation, formulas, and numeric results: [`RELAZIONE_EN.md`](RELAZIO
 
 ### Official repositories (optional analysis)
 
-Clones are not included in the Git repository (see `.gitignore`). For the analysis described in RELAZIONE §15:
+Clones are not included in the Git repository (see `.gitignore`). For the analysis described in REPORT §15:
 
 ```powershell
 git clone https://github.com/jennyzzt/dgm.git dgm
@@ -240,7 +240,8 @@ Logs: `results/llm_logs/`, `results/sandbox_logs/`, `runs/sandbox/`
 dgm_hyperagents/
 ├── README.md                 ← Italian version
 ├── README_EN.md              ← this file
-├── RELAZIONE.md              ← full report (Italian)
+├── REPORT.md                 ← official report (English)
+├── RELAZIONE.md              ← Italian translation
 ├── requirements.txt          ← Python dependencies (all demos)
 ├── experiments/              ← runnable code
 │   ├── common.py             ← shared DGM-H loop
@@ -267,7 +268,7 @@ dgm_hyperagents/
 | DGM | https://github.com/jennyzzt/dgm | `a565fd2d1dca504ef5104a7cc0f3bdc4ab9b4fd2` |
 | HyperAgents | https://github.com/facebookresearch/Hyperagents | `59a68f672dfb92c74aeb7e61535d776fb36e172d` |
 
-Analysis details: RELAZIONE §15.
+Analysis details: REPORT §15.
 
 ---
 

@@ -1,5 +1,7 @@
 # Report: didactic reproduction of DGM-Hyperagents
 
+> **Official project report** (English). Italian translation: [`RELAZIONE.md`](RELAZIONE.md).
+
 **Course:** IoT  
 **Author:** Maria Navarria  
 **Reference paper:** *Hyperagents* — Zhang J., Zhao B., Yang W., Foerster J., Clune J., Jiang M., Devlin S., Shavrina T., arXiv 2603.19461 (2026)  
@@ -137,8 +139,8 @@ The weight is high for agents that **are above the current performance frontier*
 dgm_hyperagents/
 ├── README.md                        <-- execution guide and prerequisites
 ├── README_EN.md                     <-- English execution guide
-├── RELAZIONE_EN.md
-├── RELAZIONE.md                     <-- this document (Italian)
+├── REPORT.md                        <-- this document (official report)
+├── RELAZIONE.md                     <-- Italian translation
 ├── requirements.txt                 <-- Python dependencies (all demos)
 ├── experiments/
 │   ├── common.py                    <-- DGM-H cycle, classes, parent selection
