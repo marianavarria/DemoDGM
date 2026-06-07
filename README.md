@@ -4,7 +4,7 @@ A small-scale reproduction of the algorithmic concepts from **DGM-Hyperagents** 
 
 Official report: [`REPORT.md`](REPORT.md) (English) · Italian translation: [`RELAZIONE.md`](RELAZIONE.md).
 
-Italian README: [`README.md`](README.md)
+Italian README: [`README_IT.md`](README_IT.md)
 
 ---
 
@@ -238,8 +238,8 @@ Logs: `results/llm_logs/`, `results/sandbox_logs/`, `runs/sandbox/`
 
 ```text
 dgm_hyperagents/
-├── README.md                 ← Italian version
-├── README_EN.md              ← this file
+├── README.md                 ← this file (English)
+├── README_IT.md              ← Italian version
 ├── REPORT.md                 ← official report (English)
 ├── RELAZIONE.md              ← Italian translation
 ├── requirements.txt          ← Python dependencies (all demos)

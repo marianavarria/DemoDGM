@@ -4,7 +4,7 @@ Riproduzione in piccolo dei concetti algoritmici di **DGM-Hyperagents** (Zhang e
 
 Relazione ufficiale: [`REPORT.md`](REPORT.md) (inglese) · traduzione italiana: [`RELAZIONE.md`](RELAZIONE.md).
 
-English README: [`README_EN.md`](README_EN.md)
+English README: [`README.md`](README.md)
 
 ---
 
@@ -238,8 +238,8 @@ Log: `results/llm_logs/`, `results/sandbox_logs/`, `runs/sandbox/`
 
 ```text
 dgm_hyperagents/
-├── README.md                 ← questo file
-├── README_EN.md              ← versione inglese
+├── README.md                 ← versione inglese
+├── README_IT.md              ← questo file
 ├── REPORT.md                 ← relazione ufficiale (inglese)
 ├── RELAZIONE.md              ← traduzione italiana
 ├── requirements.txt          ← dipendenze Python (tutte le demo)

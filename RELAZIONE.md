@@ -137,8 +137,8 @@ Il peso è alto per gli agenti che **sono sopra la frontiera attuale di performa
 
 ```text
 dgm_hyperagents/
-├── README.md                        <-- guida esecuzione e prerequisiti
-├── README_EN.md                     <-- guida esecuzione in inglese
+├── README.md                        <-- guida esecuzione in inglese
+├── README_IT.md                     <-- guida esecuzione e prerequisiti (italiano)
 ├── REPORT.md                        <-- relazione ufficiale (inglese)
 ├── RELAZIONE.md                     <-- questo documento (traduzione italiana)
 ├── requirements.txt                 <-- dipendenze Python (tutte le demo)
