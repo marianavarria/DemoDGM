@@ -369,6 +369,24 @@ def write_csv(path: str, rows: Iterable[dict[str, Any]]) -> None:
         writer.writerows(rows)
 
 
+def merge_csv_variants(
+    path: str,
+    new_rows: Iterable[dict[str, Any]],
+    variant_key: str = "variant",
+) -> None:
+    """Scrive CSV preservando le righe di varianti gia' presenti nel file."""
+    new_rows = list(new_rows)
+    if not new_rows:
+        raise ValueError("Nessuna riga da salvare.")
+    replaced = {row[variant_key] for row in new_rows}
+    existing: list[dict[str, str]] = []
+    if os.path.exists(path):
+        existing = [
+            row for row in read_csv(path) if row.get(variant_key) not in replaced
+        ]
+    write_csv(path, existing + new_rows)
+
+
 def read_csv(path: str) -> list[dict[str, str]]:
     with open(path, newline="", encoding="utf-8") as file:
         return list(csv.DictReader(file))

@@ -3,19 +3,26 @@ Demo 7: mini code-repair con meta-agent Ollama e valutazione in sandbox Docker.
 
 Prerequisiti:
   1. Docker Desktop avviato (docker run hello-world)
-  2. Ollama in esecuzione su http://localhost:11434
+  2. Modalita' LLM reale (default): Ollama su http://localhost:11434
      - installa da https://ollama.com
      - poi: ollama pull llama3.2
-  3. venv con litellm: pip install litellm
+     - pip install litellm  (oppure: pip install -r requirements.txt)
+  3. Modalita' mock (--mock): solo Docker, nessun Ollama ne' litellm
 
 Variabili d'ambiente opzionali:
   OLLAMA_MODEL=ollama/llama3.2
   OLLAMA_API_BASE=http://localhost:11434
   DGMH_SANDBOX_IMAGE=python:3.12-slim
+  DGMH_LLM_ITERATIONS=12
+  DGMH_LLM_SEEDS=2
 
 Uso:
   python experiments/llm_code_repair.py
   python experiments/llm_code_repair.py --mock    # senza Ollama (solo test sandbox)
+
+Output:
+  results/llm_code_repair_mock.csv | llm_code_repair_real.csv  (per modalita')
+  results/llm_code_repair.csv       (combinato, colonna mode)
 """
 
 from __future__ import annotations
@@ -33,6 +40,7 @@ if _EXPERIMENTS_DIR not in sys.path:
 from common import (
     CandidateProgram,
     best_by_iteration,
+    merge_csv_variants,
     plot_csv,
     run_dgm_h,
     select_score_child_prop,
@@ -127,16 +135,27 @@ def check_prerequisites(mock: bool) -> None:
             "Ollama non raggiungibile su http://localhost:11434. "
             "Installa Ollama, avvialo e esegui: ollama pull llama3.2"
         )
-    try:
-        import litellm  # noqa: F401
-    except ImportError:
-        errors.append("Modulo litellm mancante. Esegui: pip install litellm")
+    if not mock:
+        try:
+            import litellm  # noqa: F401
+        except ImportError:
+            errors.append("Modulo litellm mancante. Esegui: pip install litellm")
 
     if errors:
         for message in errors:
             print(f"ERRORE: {message}")
         print("\nPer testare solo Docker+sandbox senza Ollama: python experiments/llm_code_repair.py --mock")
         raise SystemExit(1)
+
+
+def annotate_rows(rows: list[dict], mode: str, variant: str) -> list[dict]:
+    annotated = []
+    for row in rows:
+        enriched = dict(row)
+        enriched["mode"] = mode
+        enriched["variant"] = variant
+        annotated.append(enriched)
+    return annotated
 
 
 def save_llm_logs(meta_agent: LLMMetaAgent, seed: int) -> None:
@@ -159,7 +178,12 @@ def main() -> None:
     os.makedirs(RUNS_DIR, exist_ok=True)
     sandbox_workdir = os.path.join(RUNS_DIR, "sandbox")
 
+    mode = "mock" if args.mock else "real"
+    variant = "llm_code_repair_mock" if args.mock else "llm_code_repair"
+    mode_label = "Mock (patch fissa, no Ollama)" if args.mock else "LLM reale (Ollama)"
+
     print("=== Demo 7: LLM (Ollama) + Docker sandbox ===")
+    print(f"Modalita': {mode_label}")
     print(f"Docker: OK | Ollama: {'mock' if args.mock else 'OK'}")
     print(f"Modello: {os.environ.get('OLLAMA_MODEL', 'ollama/llama3.2')}")
     print(f"Iterazioni: {ITERATIONS}, seed: {list(SEEDS)}")
@@ -178,7 +202,7 @@ def main() -> None:
         meta = make_llm_meta(mock=args.mock)
         print(f"\n--- Seed {seed} ---")
         archive = run_dgm_h(
-            variant="llm_code_repair_mock" if args.mock else "llm_code_repair",
+            variant=variant,
             train_data=TRAIN_DATA,
             test_data=TEST_DATA,
             initial_program=make_initial(),
@@ -191,7 +215,7 @@ def main() -> None:
             use_sandbox=True,
             sandbox_workdir=sandbox_workdir,
         )
-        rows.extend(best_by_iteration(archive))
+        rows.extend(annotate_rows(best_by_iteration(archive), mode, variant))
         save_llm_logs(meta, seed)
         best = max(archive, key=lambda e: e.train_score)
         print(
@@ -199,12 +223,27 @@ def main() -> None:
             f"train={best.train_score:.2f}, test={best.test_score:.2f}"
         )
 
-    csv_path = os.path.join(RESULTS, "llm_code_repair.csv")
-    png_path = os.path.join(RESULTS, "llm_code_repair.png")
-    write_csv(csv_path, rows)
-    plot_csv(csv_path, png_path, "Code-repair con Ollama + Docker sandbox")
-    print(f"\nSalvati: {csv_path}")
-    print(f"Salvati: {png_path}")
+    mode_csv_path = os.path.join(RESULTS, f"llm_code_repair_{mode}.csv")
+    combined_csv_path = os.path.join(RESULTS, "llm_code_repair.csv")
+    mode_png_path = os.path.join(RESULTS, f"llm_code_repair_{mode}.png")
+    combined_png_path = os.path.join(RESULTS, "llm_code_repair.png")
+
+    write_csv(mode_csv_path, rows)
+    merge_csv_variants(combined_csv_path, rows)
+    plot_csv(
+        mode_csv_path,
+        mode_png_path,
+        f"Code-repair Demo 7 — modalita' {mode}",
+    )
+    plot_csv(
+        combined_csv_path,
+        combined_png_path,
+        "Code-repair Demo 7 — confronto mock vs LLM reale",
+    )
+    print(f"\nSalvati: {mode_csv_path}")
+    print(f"Salvati: {combined_csv_path}")
+    print(f"Salvati: {mode_png_path}")
+    print(f"Salvati: {combined_png_path}")
     print(f"Log LLM: {LLM_LOGS}/")
     print(f"Log sandbox: {os.path.join(RESULTS, 'sandbox_logs')}/")
 

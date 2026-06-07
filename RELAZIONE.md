@@ -135,8 +135,11 @@ Il peso è alto per gli agenti che **sono sopra la frontiera attuale di performa
 
 ```text
 dgm_hyperagents/
+├── README.md                        <-- guida esecuzione e prerequisiti
+├── README_EN.md                     <-- guida esecuzione in inglese
 ├── RELAZIONE_EN.md
 ├── RELAZIONE.md                     <-- questo documento
+├── requirements.txt                 <-- dipendenze Python (tutte le demo)
 ├── experiments/
 │   ├── common.py                    <-- ciclo DGM-H, classi, parent selection
 │   ├── mini_dgm_hyperagent.py       <-- demo originale palindromi
@@ -146,7 +149,8 @@ dgm_hyperagents/
 │   ├── task_vowels.py               <-- Demo 4
 │   ├── mini_code_repair.py          <-- Demo 5
 │   ├── plot_progress.py             <-- Demo 6 (overview grafica)
-│   └── lmm_code_repair.py           <-- Demo 7 modello LLM ollama
+│   ├── regenerate_plots.py          <-- rigenera PNG da CSV
+│   └── llm_code_repair.py           <-- Demo 7 modello LLM Ollama
 ├── dgm/                             <-- repo ufficiale jennyzzt/dgm
 ├── HyperAgents/                     <-- repo ufficiale facebookresearch/Hyperagents
 └── results/                         <-- CSV, PNG
@@ -167,14 +171,16 @@ dgm_hyperagents/
 
 Contiene tutti gli artefatti generati automaticamente:
 
-- **CSV** (uno per demo): cronologia per iterazione, seed, varianza.
+- **CSV** (uno per demo): cronologia per iterazione, seed, variante. La Demo 7 produce anche file separati per modalita' (`llm_code_repair_mock.csv`, `llm_code_repair_real.csv`) oltre al file combinato `llm_code_repair.csv` con colonna `mode`.
 - **PNG** (uno per demo + overview): grafici delle curve di best test score.
+
+Per istruzioni di esecuzione dettagliate vedere `README.md`.
 
 ---
 
 ## 4. Architettura della mini DGM-H
 
-Tutto il livello 1 è dentro `experiments/`. Il file `experiments/common.py` contiene tutte le classi e il ciclo. Gli altri sei file sono **configurazioni diverse** della stessa funzione `run_dgm_h`, una per ogni esperimento.
+Tutto il livello 1 è dentro `experiments/`. Il file `experiments/common.py` contiene tutte le classi e il ciclo. I sette script demo (Demo 1–7) sono **configurazioni diverse** della stessa funzione `run_dgm_h`; `plot_progress.py` (Demo 6) legge i CSV e produce l'overview grafica.
 
 ### 4.1 Diagramma delle classi
 
@@ -507,7 +513,7 @@ Il grafico mostra due curve, una per variante, dell'andamento del best test scor
 
 Sul nostro task didattico la mutazione corretta è raggiungibile in 1-2 passi, quindi l'archivio non fa molta differenza: anche solo conservando l'ultimo agente, prima o poi il meta-agent propone la strategia giusta.
 
- questa demo è una **ablation strutturale**, mostra cosa significa nel codice "rimuovere l'open-ended exploration", ma su task così piccoli non si vede il guadagno. Negli esperimenti reali dell'articolo (Figura 2) la differenza è enorme: la stessa baseline crolla a zero su paper review.
+- Questa demo è una **ablation strutturale**: mostra cosa significa nel codice "rimuovere l'open-ended exploration", ma su task così piccoli non si vede il guadagno. Negli esperimenti reali dell'articolo (Figura 2) la differenza è enorme: la stessa baseline crolla a zero su paper review.
 
 ---
 
@@ -790,31 +796,26 @@ Generare una visualizzazione **riassuntiva** delle demo disponibili a supporto d
 
 ```python
 CSV_FILES = [
-    ("Ablation archivio", "ablation_archive.csv"),
-    ("Ablation self-improve", "ablation_self_improve.csv"),
-    ("Parent selection", "parent_selection.csv"),
-    ("Task vocali", "task_vowels.csv"),
-    ("Code repair", "code_repair.csv"),
+    ("Ablation archivio", "ablation_archive.csv", None),
+    ("Ablation self-improve", "ablation_self_improve.csv", None),
+    ("Parent selection", "parent_selection.csv", None),
+    ("Task vocali", "task_vowels.csv", None),
+    ("Code repair", "code_repair.csv", None),
+    ("LLM mock (Docker)", "llm_code_repair.csv", "llm_code_repair_mock"),
+    ("LLM reale (Ollama)", "llm_code_repair.csv", "llm_code_repair"),
 ]
-
-plt.figure(figsize=(10, 6))
-for label, filename in CSV_FILES:
-    rows = read_csv(os.path.join(RESULTS, filename))
-    by_iteration: dict[int, list[float]] = {}
-    for row in rows:
-        by_iteration.setdefault(int(row["iteration"]), []).append(float(row["best_test"]))
-    xs = sorted(by_iteration)
-    ys = [mean(by_iteration[x]) for x in xs]
-    plt.plot(xs, ys, linewidth=2, label=label)
 ```
+
+Per rigenerare i PNG per-demo a partire dai CSV (senza rieseguire le demo 1–5): `python experiments/regenerate_plots.py`.
 
 ### 11.3 Spiegazione del grafico (`all_demos_overview.png`)
 
-Cinque curve sovrapposte, una per demo. Le curve mostrano comportamenti diversi:
+Sette curve (cinque demo deterministiche + mock LLM + LLM reale). Le curve mostrano comportamenti diversi:
 
 - **Code repair** converge per prima (iter 4.8).
 - **Task vocali**, **Ablation archivio**, **Parent selection** convergono fra iter 6 e 8.
-- **Ablation self-improve** mostra due regimi: la media include sia la curva piatta a 0.667 sia quella che sale a 1.0, quindi appare come una curva che cresce lentamente.
+- **Ablation self-improve** mostra due regimi: la media include sia la curva piatta a 0.667 sia quella che sale a 1.0.
+- **LLM mock** e **LLM reale** convergono entro iter 1 (task semplice; mock con patch fissa).
 
 ### 11.4 Interpretazione
 
@@ -853,25 +854,28 @@ File aggiunti:
 | `experiments/llm_meta_agent.py` | Meta-agent che chiama Ollama |
 | `experiments/sandbox.py` | Esecuzione codice in Docker |
 | `experiments/llm_code_repair.py` | Script Demo 7 |
-| `experiments/requirements-llm.txt` | Dipendenza `litellm` |
+| `requirements.txt` | Dipendenze Python (tutte le demo) |
+| `experiments/requirements-llm.txt` | Alias/riferimento LiteLLM (vedi root) |
 
 ### 12.3 Prerequisiti e avvio
 
+Vedi anche `README.md` per la guida completa. Sintesi per la Demo 7:
+
 ```powershell
-# 1. Docker Desktop avviato
+# 1. Ambiente e dipendenze (dalla root del progetto)
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+
+# 2. Docker Desktop avviato
 docker run hello-world
 
-# 2. Ollama (https://ollama.com) — avvia l'app, poi:
+# 3. Solo modalita' LLM reale: Ollama (https://ollama.com)
 ollama pull llama3.2
 
-# 3. Dipendenze Python (nel venv del progetto)
-pip install -r experiments/requirements-llm.txt
-
-# 4. Esecuzione demo
-.\.venv\Scripts\python.exe experiments/llm_code_repair.py
-
-# Test solo sandbox Docker (senza Ollama):
-.\.venv\Scripts\python.exe experiments/llm_code_repair.py --mock
+# 4. Esecuzione
+python experiments/llm_code_repair.py              # LLM reale (Ollama)
+python experiments/llm_code_repair.py --mock     # mock (solo Docker, no Ollama)
 ```
 
 Variabili d'ambiente opzionali: `OLLAMA_MODEL`, `OLLAMA_API_BASE`, `DGMH_SANDBOX_IMAGE`, `DGMH_LLM_ITERATIONS`, `DGMH_LLM_SEEDS`.
@@ -886,17 +890,30 @@ Ogni valutazione scrive uno script in `runs/sandbox/` e lo esegue con:
 
 Prima dell'esecuzione, un filtro blocca costrutti pericolosi (`import os`, `eval`, `open`, ecc.). I log sono in `results/sandbox_logs/`.
 
-### 12.5 Risultati (modalità `--mock`, Docker verificato)
+### 12.5 Risultati — distinzione modalità mock vs LLM reale
 
-Con `--mock` il meta-agent propone sempre la patch corretta `a + b`, ma la valutazione passa comunque dal sandbox Docker (come nella run reale con Ollama).
+La Demo 7 supporta due modalità esplicite, distinguibili nella colonna `mode` dei CSV:
 
-| Variante | Final test | Train |
-|---|---:|---:|
-| `llm_code_repair_mock` (2 seed) | **1.000** | **1.000** |
+| Modalità | Comando | Colonna `mode` | Variante CSV | File dedicato |
+|---|---|---|---|---|
+| **Mock** | `--mock` | `mock` | `llm_code_repair_mock` | `results/llm_code_repair_mock.csv` |
+| **LLM reale** | (default) | `real` | `llm_code_repair` | `results/llm_code_repair_real.csv` |
 
-Output: `results/llm_code_repair.csv`, `results/llm_code_repair.png`.
+Il file combinato `results/llm_code_repair.csv` contiene **entrambe** le modalità (merge senza sovrascrittura). Eseguire una modalità non cancella i risultati dell'altra.
 
-Per la run completa con Ollama reale, installare Ollama e lanciare senza `--mock`. I prompt e le risposte vengono salvati in `results/llm_logs/`.
+**Modalità mock** (`--mock`): il meta-agent propone sempre la patch corretta `a + b`, ma la valutazione passa comunque dal sandbox Docker. Serve a verificare la pipeline Docker senza Ollama.
+
+| Variante | Final test (2 seed) | Train | Note |
+|---|---:|---:|---|
+| `llm_code_repair_mock` | **1.000** | **1.000** | Convergenza artificiale (patch fissa) |
+
+**Modalità LLM reale** (Ollama + LiteLLM): il meta-agent genera patch via prompt; prompt e risposte in `results/llm_logs/`.
+
+| Variante | Final test (2 seed) | Train | Note |
+|---|---:|---:|---|
+| `llm_code_repair` | **1.000** | **1.000** | Patch generate da `llama3.2` via Ollama |
+
+Output grafici: `llm_code_repair_mock.png`, `llm_code_repair_real.png`, `llm_code_repair.png` (confronto).
 
 ### 12.6 Interpretazione
 
@@ -926,7 +943,8 @@ Tutti i numeri sono medie su 5 o 8 seed.
 | 3 | `parent_selection_strategies.py` | `score_child_prop` | 1.000 | 0.000 | 7.13 | Default DGM-H |
 | 4 | `task_vowels.py` | `task_vocali` | 1.000 | 0.000 | 6.4 | Sec. 8.4 multi-domain |
 | 5 | `mini_code_repair.py` | `mini_code_repair` | 1.000 | 0.000 | 4.8 | Polyglot/SWE-bench in piccolo |
-| 7 | `llm_code_repair.py` | `llm_code_repair_mock` | 1.000 | 0.000 | — | Ollama + Docker sandbox |
+| 7 | `llm_code_repair.py` | `llm_code_repair_mock` (`mode=mock`) | 1.000 | 0.000 | 1 | Docker sandbox, patch fissa |
+| 7 | `llm_code_repair.py` | `llm_code_repair` (`mode=real`) | 1.000 | 0.000 | 1 | Ollama + Docker sandbox |
 
 **Le due righe in grassetto sono il risultato chiave**: dimostrano che la differenza fra DGM-H completo e baseline senza self-improve è netta (0.333 di gap, statisticamente significativa nel nostro setup).
 
@@ -974,44 +992,131 @@ Senza questo, ogni sistema di self-improvement resta bloccato dal suo design ini
 
 ## 15. Relazione con i repository ufficiali
 
+Questa sezione documenta in dettaglio l'analisi dei due repository open-source citati nel paper *Hyperagents* e nel lavoro precedente *Darwin Gödel Machine* (DGM). I clone non sono versionati in Git (`.gitignore`); i commit esatti sono registrati in `results/repo_commits.txt`.
+
+### 15.0 Procedura di clone e versione testata
+
+```powershell
+git clone https://github.com/jennyzzt/dgm.git dgm
+git clone https://github.com/facebookresearch/Hyperagents.git HyperAgents
+
+cd dgm
+git checkout a565fd2d1dca504ef5104a7cc0f3bdc4ab9b4fd2
+
+cd ../HyperAgents
+git checkout 59a68f672dfb92c74aeb7e61535d776fb36e172d
+```
+
+| Repository | URL | Commit |
+|---|---|---|
+| DGM | https://github.com/jennyzzt/dgm | `a565fd2d1dca504ef5104a7cc0f3bdc4ab9b4fd2` |
+| HyperAgents | https://github.com/facebookresearch/Hyperagents | `59a68f672dfb92c74aeb7e61535d776fb36e172d` |
+
 ### 15.1 Repository DGM (`dgm/`)
 
-- Versione testata: commit `a565fd2d1dca504ef5104a7cc0f3bdc4ab9b4fd2`.
-- Dipendenze installate con successo: `pip install -r dgm/requirements.txt`.
-- Test eseguiti con `pytest dgm/tests`: **11 passati, 11 falliti**.
-- Fallimenti causati da funzionalità Unix come `os.setsid`, non disponibili su Windows.
+Il repository **DGM** implementa agenti che si auto-migliorano su task di coding (SWE-bench, Polyglot) usando LLM e strumenti `bash`/`editor` in ambiente Docker.
 
-File principali analizzati:
+#### 15.1.1 Architettura e file principali
 
-| File | Ruolo |
-|---|---|
-| `DGM_outer.py` | ciclo esterno della DGM |
-| `self_improve_step.py` | passo di auto-miglioramento |
-| `coding_agent.py`, `coding_agent_polyglot.py` | agenti per SWE-bench e Polyglot |
-| `prompts/` | prompt fissi per il `diagnose_prompt` |
-| `tools/` | strumenti `bash` ed `editor` |
+| File / cartella | Ruolo | Corrispondenza nelle mini-demo |
+|---|---|---|
+| `DGM_outer.py` | Ciclo esterno: iterazioni, selezione parent | `common.run_dgm_h()` |
+| `self_improve_step.py` | Passo di auto-miglioramento (diagnosi + patch) | `MetaAgent.generate_candidates()` / Demo 2 |
+| `coding_agent.py` | Agente per SWE-bench Verified | Demo 5 / 7 (code-repair) |
+| `coding_agent_polyglot.py` | Variante Polyglot multi-linguaggio | Demo 5 (concetto) |
+| `prompts/` | Prompt fissi (`diagnose_prompt`, ecc.) | `llm_meta_agent.py` (Demo 7) |
+| `tools/bash.py`, `tools/editor.py` | Strumenti nel container | `sandbox.py` (valutazione isolata) |
+| `tests/` | Suite pytest (22 test al commit testato) | — |
 
-Per riprodurre completamente il DGM serve: Linux/WSL + Docker + API key OpenAI / Anthropic.
+#### 15.1.2 Dipendenze e test su Windows
+
+```powershell
+pip install -r dgm/requirements.txt
+pytest dgm/tests -v
+```
+
+**Risultato:** 11 test passati, 11 falliti su Windows nativo.
+
+| Categoria di fallimento | Esempio | Causa |
+|---|---|---|
+| API POSIX | `os.setsid`, `signal.SIGTERM` | Non disponibili su Windows |
+| Subprocess / shell | Invocazioni bash-like | Richiede WSL o Linux |
+| Docker networking | Configurazione rete container | Comportamento diverso su Docker Desktop |
+
+Per riproduzione completa servono **Linux/WSL**, **Docker** e **API key** OpenAI o Anthropic.
+
+#### 15.1.3 Flusso algoritmico (DGM ufficiale vs mini-demo)
+
+```text
+DGM ufficiale                         Mini-demo (livello 1)
+─────────────────                     ─────────────────────
+DGM_outer.py loop          ≈          run_dgm_h()
+  └─ select parent         ≈          select_score_child_prop / altre
+  └─ self_improve_step     ≈          MetaAgent.generate_candidates
+       └─ LLM + editor     ≈          CandidateProgram (stringhe Python)
+       └─ valuta in Docker ≈          evaluate_with_sandbox (Demo 7)
+  └─ archivio open-ended   ≈          ArchiveEntry + archive_mode
+```
 
 ### 15.2 Repository HyperAgents (`HyperAgents/`)
 
-- Versione testata: commit `59a68f672dfb92c74aeb7e61535d776fb36e172d`.
-- Dipendenze base installate.
-- File principali verificati sintatticamente con `python -m py_compile`:
-  - `generate_loop.py` (entry point)
-  - `meta_agent.py`, `task_agent.py`
-  - `select_next_parent.py`
-- Domini disponibili: `polyglot`, `imo`, `genesis`, `balrog`.
-- Baseline interna `baselines/dgm/` che cita esplicitamente `github.com/jennyzzt/dgm`.
+**HyperAgents** generalizza il DGM su piu' domini (Polyglot, IMO, Genesis, Balrog) con meta-agent LLM condiviso.
 
-Per la riproduzione completa serve: Fedora o WSL, Docker con `--network=host`, dipendenze pesanti (Balrog, Genesis), API key per OpenAI / Anthropic / Gemini. I log degli esperimenti ufficiali sono ospitati su Google Drive (link nel README del repo).
+#### 15.2.1 Entry point e moduli core
+
+| File | Ruolo | Verifica effettuata |
+|---|---|---|
+| `generate_loop.py` | Entry point del ciclo hyperagent | `python -m py_compile` |
+| `meta_agent.py` | Meta-agent che propone modifiche | `py_compile` |
+| `task_agent.py` | Agente operativo sul dominio | `py_compile` |
+| `select_next_parent.py` | Parent selection (formule Sec. 8.2) | `py_compile` |
+| `baselines/dgm/` | Baseline che riusa codice DGM | Ispezione manuale |
+
+#### 15.2.2 Domini disponibili
+
+| Dominio | Descrizione | Analogia locale |
+|---|---|---|
+| `polyglot` | Coding multi-linguaggio | Demo 5 / 7 |
+| `imo` | Problem solving matematico | non replicato |
+| `genesis` | Simulazione robotica / reward | Demo 4 (dominio semplificato) |
+| `balrog` | Ambiente RL complesso | non replicato |
+
+#### 15.2.3 Requisiti per riproduzione completa
+
+| Requisito | Dettaglio |
+|---|---|
+| OS | Fedora o WSL2 (README ufficiale) |
+| Docker | `--network=host` per alcuni domini |
+| Dipendenze | Balrog, Genesis, stack RL |
+| API key | OpenAI, Anthropic, Gemini |
+| Log ufficiali | Google Drive (link nel README HyperAgents) |
+
+Su Windows nativo e' stato possibile verificare la sintassi e leggere la struttura; l'esecuzione end-to-end non e' stata tentata.
+
+### 15.3 Tabella di corrispondenza concettuale
+
+| Concetto paper / repo ufficiale | Implementazione locale | Demo |
+|---|---|---|
+| Open-ended archive | `archive_mode="full"` vs `"last_only"` | 1 |
+| Meta-agent self-improve | `MetaAgent.self_improve` + `hidden_candidates` | 2 |
+| Parent selection Sec. 8.2 | quattro selector in `common.py` | 3 |
+| Multi-domain | palindromi + vocali + code-repair | 4, 5 |
+| LLM meta-agent | `LLMMetaAgent` + Ollama | 7 (real) |
+| Sandbox sicura | `sandbox.py` + Docker `--network=none` | 7 |
+| Mock / test pipeline | `MockLLMMetaAgent` + `--mock` | 7 (mock) |
+
+### 15.4 Limitazioni dell'analisi su Windows
+
+1. **DGM:** meta' dei test pytest fallisce per dipendenze POSIX; analisi basata su lettura codice + test parziali.
+2. **HyperAgents:** nessuna esecuzione completa di `generate_loop.py`; solo `py_compile` e ispezione domini.
+3. **Gap intenzionale:** le mini-demo sostituiscono LLM cloud con mutazioni deterministiche (Demo 1-6) o Ollama locale (Demo 7), mantenendo la stessa struttura algoritmica del ciclo DGM-H.
 
 
 ---
 
 ## 16. Conclusione
 
-Il progetto raggiunge l'obiettivo dichiarato: **riprodurre in piccolo, in modo onesto e didattico, il funzionamento del DGM-Hyperagents**, partendo dalla teoria dell'articolo e arrivando a sei esperimenti riproducibili in pochi secondi su Windows senza Docker e senza LLM.
+Il progetto raggiunge l'obiettivo dichiarato: **riprodurre in piccolo il funzionamento del DGM-Hyperagents**, partendo dalla teoria dell'articolo e arrivando a **sette demo** (sei riproducibili in pochi secondi su Windows senza Docker e senza LLM, più la Demo 7 con Ollama e sandbox Docker).
 
 I risultati sintetici:
 
@@ -1051,5 +1156,6 @@ Conclusione sintetica:
 - `experiments/plot_progress.py` — Demo 6
 - `experiments/llm_meta_agent.py`, `experiments/sandbox.py`, `experiments/llm_code_repair.py` — Demo 7
 - `experiments/demo_passo_passo.ipynb` — notebook didattico
-- `experiments/export_report.py` — esportazione HTML/PDF
+- `README.md` — guida esecuzione e prerequisiti
+- `requirements.txt` — dipendenze Python (tutte le demo)
 - `results/*.csv`, `results/*.png` — dati e grafici delle demo

@@ -1,0 +1,15 @@
+# Dipendenze mini-demo DGM-Hyperagents
+# Python >= 3.10 consigliato (type hints list[str], dataclass)
+
+# Demo 1-5: solo stdlib Python (nessun pacchetto obbligatorio)
+
+# Demo 6 + grafici per-iterazione in common.plot_csv
+matplotlib>=3.7.0
+
+# Notebook didattico (experiments/demo_passo_passo.ipynb) — opzionale
+jupyter>=1.0.0
+ipykernel>=6.0.0
+
+# Demo 7 — meta-agent Ollama via LiteLLM (opzionale se si usa --mock)
+# Nota: Docker Desktop e' un prerequisito di sistema, non installabile via pip
+litellm>=1.0.0

@@ -14,25 +14,31 @@ ROOT = os.path.dirname(os.path.dirname(__file__))
 RESULTS = os.path.join(ROOT, "results")
 
 CSV_FILES = [
-    ("Ablation archivio", "ablation_archive.csv"),
-    ("Ablation self-improve", "ablation_self_improve.csv"),
-    ("Parent selection", "parent_selection.csv"),
-    ("Task vocali", "task_vowels.csv"),
-    ("Code repair", "code_repair.csv"),
-    ("LLM + Docker", "llm_code_repair.csv"),
+    ("Ablation archivio", "ablation_archive.csv", None),
+    ("Ablation self-improve", "ablation_self_improve.csv", None),
+    ("Parent selection", "parent_selection.csv", None),
+    ("Task vocali", "task_vowels.csv", None),
+    ("Code repair", "code_repair.csv", None),
+    ("LLM mock (Docker)", "llm_code_repair.csv", "llm_code_repair_mock"),
+    ("LLM reale (Ollama)", "llm_code_repair.csv", "llm_code_repair"),
 ]
 
 
 def main() -> None:
     plt.figure(figsize=(10, 6))
 
-    for label, filename in CSV_FILES:
+    for label, filename, variant_filter in CSV_FILES:
         path = os.path.join(RESULTS, filename)
         if not os.path.exists(path):
             print(f"CSV mancante, salto: {path}")
             continue
 
         rows = read_csv(path)
+        if variant_filter is not None:
+            rows = [row for row in rows if row.get("variant") == variant_filter]
+            if not rows:
+                print(f"Variante assente in {path}: {variant_filter}")
+                continue
         by_iteration: dict[int, list[float]] = {}
         for row in rows:
             by_iteration.setdefault(int(row["iteration"]), []).append(

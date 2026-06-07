@@ -1,2 +1,3 @@
-# Dipendenze aggiuntive per Demo 7 (Ollama + LiteLLM)
+# Dipendenze aggiuntive solo per Demo 7 (Ollama + LiteLLM).
+# Per l'intero progetto usare: pip install -r requirements.txt
 litellm>=1.0.0
