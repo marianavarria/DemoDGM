@@ -9,6 +9,8 @@
 - `https://github.com/facebookresearch/Hyperagents`
 - `https://github.com/jennyzzt/dgm`
 
+> **Reference convention:** **Paper Sec. N** / **Paper §N** = section of the *Hyperagents* article (arXiv 2603.19461). **Report §N** / headings `## N.` = section of this document. See also `README.md` → *How to read references*.
+
 ---
 
 ## Table of contents
@@ -82,7 +84,7 @@ Important consequence: DGM-H no longer assumes that task and self-improvement co
 - **Robotics reward design** (Genesis, Go2 robot): generation of reward functions for robotic control via PPO.
 - **Olympiad-level math grading** (IMO-GradingBench): evaluation of solutions to IMO problems.
 
-### 2.3 The algorithmic cycle (Algorithm 1 of the paper)
+### 2.3 The algorithmic cycle (Algorithm 1)
 
 ```text
 Input: initial agent a^0, task set T, iterations T_max
@@ -107,9 +109,8 @@ Three ingredients make the cycle "open-ended":
 
 In DGM-H the entire program is editable, so even `Modify` and `SelectParents` can be rewritten. This is the conceptual difference from the original DGM.
 
-### 2.4 The three baselines of the paper
-
-To measure which component of DGM-H is truly important, the authors compare DGM-H with three ablated baselines (Sec. 4.1):
+### 2.4 The three baselines
+To measure which component of DGM-H is truly important, the authors compare DGM-H with three ablated baselines (Paper Sec. 4.1):
 
 | Method | Self-improving meta | Open-ended exploration | Hyperagent |
 |---|:-:|:-:|:-:|
@@ -120,7 +121,7 @@ To measure which component of DGM-H is truly important, the authors compare DGM-
 
 **Demo 1 and Demo 2** reproduce exactly the two ablations of these central rows.
 
-### 2.5 DGM-H parent selection (Sec. 8.2)
+### 2.5 DGM-H parent selection (Paper Sec. 8.2)
 
 At each iteration, the authors compute a weight for each agent in the archive:
 
@@ -171,12 +172,33 @@ dgm_hyperagents/
 
 ### 3.2 The `results/` folder
 
-Contains all automatically generated artifacts:
+Contains all automatically generated artifacts. See also `README.md` (*How to read references*, *Generated files in `results/`*, *Interpreting results*).
 
-- **CSV** (one per demo): history per iteration, seed, variant. Demo 7 also produces separate files per mode (`llm_code_repair_mock.csv`, `llm_code_repair_real.csv`) in addition to the combined file `llm_code_repair.csv` with a `mode` column.
-- **PNG** (one per demo + overview): graphs of best test score curves.
+**CSV column schema (Demos 1–6):**
 
-For detailed execution instructions see `README.md`.
+| Column | Meaning |
+|---|---|
+| `variant` | Configuration label (e.g. `con_archivio`, `meta_self_improve`) |
+| `seed` | Random seed (multiple seeds are averaged in plots) |
+| `iteration` | DGM-H loop step (0 = initial agent) |
+| `best_train` | Best training score in archive up to this iteration (0.0–1.0) |
+| `best_test` | Best **test** score up to this iteration — **Y-axis in PNG graphs** |
+| `best_agent` | Name of the best agent at this iteration |
+| `archive_size` | Number of agents in the archive |
+
+Demo 7 adds `mode` (`mock` or `real`). File index:
+
+| Demo | CSV | PNG |
+|---|---|---|
+| 1 | `ablation_archive.csv` | `ablation_archive.png` |
+| 2 | `ablation_self_improve.csv` | `ablation_self_improve.png` |
+| 3 | `parent_selection.csv` | `parent_selection.png` |
+| 4 | `task_vowels.csv` | `task_vowels.png` |
+| 5 | `code_repair.csv` | `code_repair.png` |
+| 6 | — | `all_demos_overview.png` |
+| 7 | `llm_code_repair_{mock,real}.csv`, `llm_code_repair.csv` | matching `.png` files |
+
+**PNG axes:** X = iteration; Y = mean `best_test` over seeds (one curve per variant).
 
 ---
 
@@ -252,7 +274,7 @@ class TaskAgent:
 This is the heart of the simulation, because it encapsulates the **ability to propose modifications**. In the paper, this is the quintessential editable part. Here it is deterministic, but simulates two key behaviors from the paper:
 
 1. **Progressive expansion of the mutation repertoire**: `hidden_candidates` are unlocked only when the archive reaches `unlock_score_threshold`. This replicates the idea that a meta-agent improves over time: it does not always generate the same modifications, but "discovers" more sophisticated strategies as it observes better results in the archive.
-2. **Persistent memory** (`mutation_memory`): records unlock events. Simulates the *persistent memory* described in Sec. 5.2 of the paper, where the authors show that DGM-H autonomously develops structures to track improvements over time.
+2. **Persistent memory** (`mutation_memory`): records unlock events. Simulates the *persistent memory* described in Paper Sec. 5.2, where the authors show that DGM-H autonomously develops structures to track improvements over time.
 
 ```python
 @dataclass
@@ -315,7 +337,7 @@ One row of the archive. Tracks everything needed for analysis, plots, and geneal
 
 ### 4.7 The 4 parent selection strategies
 
-Faithfully reproduce what is described in Sec. 8.2 of the paper. All are functions `(archive, rng) → ArchiveEntry`:
+Faithfully reproduce what is described in Paper Sec. 8.2. All are functions `(archive, rng) → ArchiveEntry`:
 
 ```python
 def select_random(archive, rng):
@@ -345,7 +367,7 @@ def select_score_child_prop(archive, rng):
 
 - `random`: pure exploration. Baseline.
 - `best`: pure exploitation. Opposite baseline.
-- `score_prop`: probability proportional to the sigmoid of `(α − α_mid)`. **Identical formula to Sec. 8.2 of the paper**.
+- `score_prop`: probability proportional to the sigmoid of `(α − α_mid)`. **Identical formula to Paper Sec. 8.2**.
 - `score_child_prop`: as above, multiplied by novelty bonus `1/(1+n_children)`. **Default strategy of the official DGM-H**.
 
 ---
@@ -354,7 +376,7 @@ def select_score_child_prop(archive, rng):
 
 ### 5.1 The `run_dgm_h` cycle
 
-Everything goes through a single function `run_dgm_h` in `common.py`, which reproduces Algorithm 1 of the paper:
+Everything goes through a single function `run_dgm_h` in `common.py`, which reproduces Algorithm 1:
 
 ```python
 def run_dgm_h(*, variant, train_data, test_data, initial_program, meta_agent,
@@ -460,7 +482,7 @@ Measure the effect of the open-ended archive on the DGM-H cycle. We want to unde
 
 ### 6.2 Mapping to the paper
 
-Replicates the `DGM-H w/o open-ended exploration` baseline (Algorithm 3, Sec. 9). In the paper, removing the archive causes performance to collapse on paper review (test score 0.0) and robotics reward design (test score 0.116).
+Replicates the `DGM-H w/o open-ended exploration` baseline (Algorithm 3, Paper Sec. 9). In the paper, removing the archive causes performance to collapse on paper review (test score 0.0) and robotics reward design (test score 0.116).
 
 ### 6.3 Experimental setup
 
@@ -509,7 +531,7 @@ for variant, archive_mode in configs.items():
 
 ### 6.6 Graph explanation (`ablation_archive.png`)
 
-The graph shows two curves, one per variant, of the mean best test score over the 5 seeds as a function of iteration (0..30). Both start at 0.5 (the naive initial agent) and rise rapidly, reaching 1.0 around iteration 6-7. The two curves are almost overlapping.
+The graph shows two curves, one per variant, of the mean best test score over the 5 seeds as a function of iteration (0..30). Both start at 0.5 (the naive initial agent) and rise in steps, reaching 1.0 around iteration 12. The two curves are almost overlapping.
 
 ### 6.7 Interpretation
 
@@ -523,11 +545,11 @@ On our didactic task the correct mutation is reachable in 1-2 steps, so the arch
 
 ### 7.1 Purpose
 
-Measure the effect of **metacognitive self-modification**, i.e. the meta-agent's ability to improve over time. This is the **central** idea of the paper.
+Measure the effect of **metacognitive self-modification**, i.e. the meta-agent's ability to improve over time. This is the **central idea of the article**.
 
 ### 7.2 Mapping to the paper
 
-Replicates the comparison between `DGM-H` (full) and `DGM-H w/o self-improve` (Sec. 5.1, Figure 2 of the paper). In the paper, on paper review the baseline without self-improve stops at 0.0, while DGM-H reaches 0.710. On robotics the difference is 0.213 vs 0.372.
+Replicates the comparison between `DGM-H` (full) and `DGM-H w/o self-improve` (Paper Sec. 5.1, Figure 2). In the paper, on paper review the baseline without self-improve stops at 0.0, while DGM-H reaches 0.710. On robotics the difference is 0.213 vs 0.372.
 
 ### 7.3 Experimental setup
 
@@ -596,7 +618,7 @@ Compare the four parent selection strategies from the archive. We want to unders
 
 ### 8.2 Mapping to the paper
 
-**Faithfully** implements the formulas from Sec. 8.2 of the paper: dynamic midpoint on top-3 scores, sigmoid with `λ = 10`, novelty bonus `1/(1+n_children)`.
+**Faithfully** implements the formulas from Paper Sec. 8.2: dynamic midpoint on top-3 scores, sigmoid with `λ = 10`, novelty bonus `1/(1+n_children)`.
 
 ### 8.3 Experimental setup
 
@@ -665,7 +687,7 @@ Show generalization of the framework to a second computable task, without modify
 
 ### 9.2 Mapping to the paper
 
-Replicates in miniature the idea of Sec. 8.4 *"Multi-domain optimization"*: the same framework works on different domains simply by changing data and mutations.
+Replicates in miniature the idea of Paper Sec. 8.4 *"Multi-domain optimization"*: the same framework works on different domains simply by changing data and mutations.
 
 ### 9.3 Experimental setup
 
@@ -714,7 +736,7 @@ A single curve, starts from the initial baseline (around 0.625), rises rapidly w
 
 ### 9.7 Interpretation
 
-By changing only the dataset and the list of candidate mutations, the entire `run_dgm_h` cycle works without a single modification to the code. This is exactly the spirit of the paper's thesis: **any computable task** can be optimized with the same framework.
+By changing only the dataset and the list of candidate mutations, the entire `run_dgm_h` cycle works without a single modification to the code. This is exactly the spirit's thesis: **any computable task** can be optimized with the same framework.
 
 ---
 
@@ -726,7 +748,7 @@ Move closer to the original DGM domain: repair of faulty code evaluated by tests
 
 ### 10.2 Mapping to the paper
 
-DGM-H inherits the DGM design, which was born precisely for coding. Sec. 5.1 of the paper reports that DGM-H reaches **0.267** on the Polyglot benchmark, comparable to the original DGM (0.307). Our demo is an ultra-simplified version of that scenario.
+DGM-H inherits the DGM design, which was born precisely for coding. Paper Sec. 5.1 reports that DGM-H reaches **0.267** on the Polyglot benchmark, comparable to the original DGM (0.307). Our demo is an ultra-simplified version of that scenario.
 
 ### 10.3 Experimental setup
 
@@ -833,7 +855,7 @@ The overview visually communicates that:
 
 ### 12.1 Purpose
 
-Extend Demo 5 (code-repair) by replacing the deterministic meta-agent with **Ollama** (via LiteLLM) and evaluating the generated code inside **isolated Docker containers**, in line with Sec. 6 (Safety) of the paper.
+Extend Demo 5 (code-repair) by replacing the deterministic meta-agent with **Ollama** (via LiteLLM) and evaluating the generated code inside **isolated Docker containers**, in line with Paper Sec. 6 (Safety).
 
 No dedicated VM is needed: Docker Desktop on Windows is sufficient for the sandbox.
 
@@ -941,9 +963,9 @@ All numbers are means over 5 or 8 seeds.
 | **2** | `ablation_self_improve.py` | `meta_self_improve` | **1.000** | 0.000 | **10.6** | Full DGM-H |
 | 3 | `parent_selection_strategies.py` | `random` | 1.000 | 0.000 | 8.25 | Baseline |
 | 3 | `parent_selection_strategies.py` | `best` | 1.000 | 0.000 | 8.13 | Pure exploitation |
-| 3 | `parent_selection_strategies.py` | `score_prop` | 1.000 | 0.000 | 7.13 | Sigmoid Sec. 8.2 |
+| 3 | `parent_selection_strategies.py` | `score_prop` | 1.000 | 0.000 | 7.13 | Sigmoid Paper Sec. 8.2 |
 | 3 | `parent_selection_strategies.py` | `score_child_prop` | 1.000 | 0.000 | 7.13 | DGM-H default |
-| 4 | `task_vowels.py` | `task_vocali` | 1.000 | 0.000 | 6.4 | Sec. 8.4 multi-domain |
+| 4 | `task_vowels.py` | `task_vocali` | 1.000 | 0.000 | 6.4 | Paper Sec. 8.4 multi-domain |
 | 5 | `mini_code_repair.py` | `mini_code_repair` | 1.000 | 0.000 | 4.8 | Polyglot/SWE-bench in miniature |
 | 7 | `llm_code_repair.py` | `llm_code_repair_mock` (`mode=mock`) | 1.000 | 0.000 | 1 | Docker sandbox, fixed patch |
 | 7 | `llm_code_repair.py` | `llm_code_repair` (`mode=real`) | 1.000 | 0.000 | 1 | Ollama + Docker sandbox |
@@ -958,7 +980,7 @@ All numbers are means over 5 or 8 seeds.
 
 - The cycle `generate → evaluate → archive → select → modify` works on all three types of tasks tried (palindrome classification, vowel classification, code-repair).
 - The archive grows in an open-ended way and produces a traceable genealogy (`parent_id`).
-- The four parent selection strategies are implemented faithfully to the formulas of Sec. 8.2 of the paper.
+- The four parent selection strategies are implemented faithfully to the formulas of Paper Sec. 8.2.
 - The difference between frozen meta-agent and evolving meta-agent is clear and replicates the paper's central thesis.
 
 ### 14.2 What converges too easily
@@ -984,7 +1006,7 @@ Our setup is enormously smaller and with the LLM replaced by a mutation list, bu
 
 ### 14.4 Why all this matters
 
-The underlying message of the paper, which our mini-replica supports, is:
+The underlying message, which our mini-replica supports, is:
 
 > *To build AI truly capable of self-improvement on any computable task, it is not enough to improve the task agent. One must design systems in which even the mechanism that generates improvements can be modified by the system itself.*
 
@@ -1071,7 +1093,7 @@ DGM_outer.py loop          ≈          run_dgm_h()
 | `generate_loop.py` | Hyperagent cycle entry point | `python -m py_compile` |
 | `meta_agent.py` | Meta-agent that proposes modifications | `py_compile` |
 | `task_agent.py` | Operational agent on the domain | `py_compile` |
-| `select_next_parent.py` | Parent selection (Sec. 8.2 formulas) | `py_compile` |
+| `select_next_parent.py` | Parent selection (Paper Sec. 8.2 formulas) | `py_compile` |
 | `baselines/dgm/` | Baseline reusing DGM code | Manual inspection |
 
 #### 15.2.2 Available domains
@@ -1101,7 +1123,7 @@ On native Windows it was possible to verify syntax and read the structure; end-t
 |---|---|---|
 | Open-ended archive | `archive_mode="full"` vs `"last_only"` | 1 |
 | Meta-agent self-improve | `MetaAgent.self_improve` + `hidden_candidates` | 2 |
-| Parent selection Sec. 8.2 | four selectors in `common.py` | 3 |
+| Parent selection Paper Sec. 8.2 | four selectors in `common.py` | 3 |
 | Multi-domain | palindromes + vowels + code-repair | 4, 5 |
 | LLM meta-agent | `LLMMetaAgent` + Ollama | 7 (real) |
 | Safe sandbox | `sandbox.py` + Docker `--network=none` | 7 |
@@ -1124,7 +1146,7 @@ Summary results:
 
 - **Seven demos executed** successfully, all with output saved in CSV and PNG.
 - **One statistically significant difference** was observed (Demo 2, 0.667 vs 1.000), which conceptually reproduces the paper's central thesis.
-- **Four parent selection strategies** were implemented faithfully to the formulas of Sec. 8.2.
+- **Four parent selection strategies** were implemented faithfully to the formulas of Paper Sec. 8.2.
 - **Three depth levels** were covered: runnable local mini-demos, DGM repo analysis, HyperAgents repo analysis.
 
 Summary conclusion:
