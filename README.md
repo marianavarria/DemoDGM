@@ -425,3 +425,11 @@ Analysis details: [Report §15](REPORT.md#15-relationship-with-official-reposito
 
 - Zhang J. et al. (2026). *Hyperagents*. arXiv 2603.19461.
 - Zhang J. et al. (2025). *Darwin Gödel Machine*. arXiv 2505.22954.
+
+---
+
+## License
+
+Copyright © 2026 Maria Navarria. All rights reserved.
+
+This repository is published for viewing and portfolio purposes only. No license is granted: the code may not be copied, modified, redistributed, or used in other projects without the author's prior written permission.
